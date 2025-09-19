@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")  # safe backend on headless/cloud hosts
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from fpdf import FPDF
 
 st.set_page_config(page_title="SustainaMine - LCA for Metals", layout="wide")
