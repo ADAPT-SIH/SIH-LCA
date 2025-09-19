@@ -105,10 +105,23 @@ st.markdown("---")
 st.header("Run an LCA Estimate (Demo Input)")
 with st.form(key='input_form'):
     col1, col2, col3 = st.columns(3)
-    with col1:
-        metal = st.selectbox("Select metal", ["Aluminium", "Copper"])
-        production_route = st.selectbox("Production route", ["Virgin/Raw", "Recycled", "Mixed"])
-        recycled_pct = st.slider("Recycled content (%)", 0, 100, 30)
+  with col1:
+    metal = st.selectbox("Select metal", ["Aluminium", "Copper"])
+    
+    if metal == "Aluminium":
+        state = st.selectbox("State of extraction", 
+                             ["Odisha", "Gujarat", "Maharashtra", "Chhattisgarh", "Jharkhand", "Other"])
+        ore_quality = st.selectbox("Bauxite quality (Al₂O₃%)", 
+                                   ["High (>45%)", "Medium (35–45%)", "Low (<35%)"])
+    elif metal == "Copper":
+        state = st.selectbox("State of extraction", 
+                             ["Rajasthan", "Madhya Pradesh", "Jharkhand", "Other/Import"])
+        ore_quality = st.selectbox("Copper ore grade", 
+                                   ["High (>2% Cu)", "Medium (1–2% Cu)", "Low (<1% Cu)"])
+    
+    production_route = st.selectbox("Production route", ["Virgin/Raw", "Recycled", "Mixed"])
+    recycled_pct = st.slider("Recycled content (%)", 0, 100, 30)
+
     with col2:
         energy_source = st.selectbox("Energy source (select nearest)", ["Coal-based grid", "Mixed grid", "Renewable-heavy"])
         transport_km = st.number_input("Transport distance (km)", min_value=0, max_value=5000, value=200)
