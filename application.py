@@ -117,7 +117,7 @@ elif metal == "Copper":
     # recycling energy cost estimate (USD per ton processed) - illustrative
     "recycle_cost_usd_per_t_aluminium": 200.0,
     "recycle_cost_usd_per_t_copper": 300.0
-}
+
 
 st.json(default_factors)
 
