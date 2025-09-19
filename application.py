@@ -89,7 +89,9 @@ default_factors = {
     # SO2 estimate per tonne copper smelted (kg SO2 / t copper) - illustrative
     "so2_kg_per_t_copper": 25.0,
     # Adjust red mud estimate based on ore quality
-if metal == "Aluminium":
+with st.form("input_form"): 
+    if metal == "Aluminium":
+
     if "High" in ore_quality:
         quality_factor = 1.0
     elif "Medium" in ore_quality:
