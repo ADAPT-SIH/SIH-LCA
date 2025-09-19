@@ -88,6 +88,16 @@ default_factors = {
     "red_mud_t_per_t_aluminium": 1.5,
     # SO2 estimate per tonne copper smelted (kg SO2 / t copper) - illustrative
     "so2_kg_per_t_copper": 25.0,
+    # Adjust red mud estimate based on ore quality
+if metal == "Aluminium":
+    if "High" in ore_quality:
+        quality_factor = 1.0
+    elif "Medium" in ore_quality:
+        quality_factor = 1.2
+    else:  # Low
+        quality_factor = 1.5
+    red_mud_t = default_factors["red_mud_t_per_t_aluminium"] * transport_tonnes * quality_factor
+
     # transport emission per ton-km (kg CO2e)
     "transport_kgco2_per_tkm": 0.05,
     # recycling energy cost estimate (USD per ton processed) - illustrative
