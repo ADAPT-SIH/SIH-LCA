@@ -89,8 +89,26 @@ default_factors = {
     # SO2 estimate per tonne copper smelted (kg SO2 / t copper)
     "so2_kg_per_t_copper": 25.0
 }
-{
-# ✅ Logic should be outside
+
+# Dictionary of factors
+default_factors = {
+    # kg CO2e per kg metal (stage-summed rough)
+    "aluminium_virgin_kgco2_per_kg": 16.0,
+    "aluminium_recycled_kgco2_per_kg": 4.0,
+    "copper_virgin_kgco2_per_kg": 8.0,
+    "copper_recycled_kgco2_per_kg": 2.0,
+    # red mud generation per tonne aluminium
+    "red_mud_t_per_t_aluminium": 1.5,
+    # SO2 per tonne copper
+    "so2_kg_per_t_copper": 25.0,
+    # transport emission per ton-km (kg CO2e)
+    "transport_kgco2_per_tkm": 0.05,
+    # recycling costs
+    "recycle_cost_usd_per_t_aluminium": 200.0,
+    "recycle_cost_usd_per_t_copper": 300.0
+}
+
+# Logic section
 if metal == "Aluminium":
     if "High" in ore_quality:
         quality_factor = 1.0
@@ -112,12 +130,6 @@ elif metal == "Copper":
     so2_kg_total = default_factors["so2_kg_per_t_copper"] * transport_tonnes * so2_factor
 
 
-    # transport emission per ton-km (kg CO2e)
-    "transport_kgco2_per_tkm": 0.05,
-    # recycling energy cost estimate (USD per ton processed) - illustrative
-    "recycle_cost_usd_per_t_aluminium": 200.0,
-    "recycle_cost_usd_per_t_copper": 300.0
-}
 
 st.json(default_factors)
 
