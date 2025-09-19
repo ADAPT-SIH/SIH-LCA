@@ -1,5 +1,5 @@
 # app.py
-# Streamlit prototype: AI-Driven LCA Tool (India-centric) -- extended version
+# Streamlit prototype: AI-Driven LCA Tool (India-centric) -- corrected version
 # Save as app.py and run: streamlit run app.py
 # Note: many numbers here are illustrative defaults. Replace with validated data if available.
 
@@ -7,7 +7,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from fpdf import FPDF
-import textwrap
 
 st.set_page_config(page_title="SustainaMine - LCA for Metals", layout="wide")
 
@@ -35,7 +34,6 @@ compliance support for India.
 **Note:** Default numbers are *illustrative*. Replace with validated local data for final deployment.
 """)
 
-# Quick policy / pro-government statement
 st.info("""
 **Pro-government framing:** This tool is built to _support_ Government of India objectives — it helps industry
 adhere to CPCB / MoEFCC guidelines, follow the Hazardous & Other Wastes Rules (2016), and advance circularity
@@ -47,12 +45,11 @@ aligned with National Mineral Policy goals. It **does not** replace statutory ap
 # ---------------------------
 st.header("India Context & Production (quick snapshot)")
 
-col1, col2 = st.columns([2,3])
+col1, col2 = st.columns([2, 3])
 with col1:
     st.subheader("Major Aluminium-producing states (India)")
     st.write("""
     Typical top-producing states (industry & reports): **Odisha, Gujarat, Maharashtra, Chhattisgarh, Jharkhand**.
-    Source: compilation of industry and government reports (see sources panel below).  
     These states host large alumina/aluminium complexes (NALCO, Hindalco, Vedanta, BALCO).
     """)
     st.write("Source links:")
@@ -63,9 +60,7 @@ with col2:
     st.subheader("Major Copper-producing regions (India)")
     st.write("""
     Copper ore/concentrate and refined copper production has strong footprints in **Rajasthan, Madhya Pradesh** and
-    several large smelter/plant clusters (recent developments also in Gujarat due to new smelters). India imports a
-    large share of concentrates; domestic production varies year to year.
-    Sources: Indian Minerals Yearbook & industry reports.
+    several large smelter/plant clusters. India imports a large share of concentrates; domestic production varies year to year.
     """)
     st.write(f"- Copper Yearbook (IBM): {SOURCES['Indian_Minerals_Yearbook_Copper']}")
     st.write(f"- Industry reports (news & ministry pages): {SOURCES['Minerals_Aluminium_page']}")
@@ -80,147 +75,134 @@ st.write("These are example baseline factors you can edit in code or replace wit
 
 default_factors = {
     # kg CO2e per kg metal (stage-summed rough)
-    "aluminium_virgin_kgco2_per_kg": 16.0,   # typical range varies widely; aluminium smelting is energy intensive
+    "aluminium_virgin_kgco2_per_kg": 16.0,   # aluminium smelting heavy-energy example
     "aluminium_recycled_kgco2_per_kg": 4.0,
     "copper_virgin_kgco2_per_kg": 8.0,
     "copper_recycled_kgco2_per_kg": 2.0,
     # red mud generation per tonne aluminium (tons red mud / ton Al)
     "red_mud_t_per_t_aluminium": 1.5,
     # SO2 estimate per tonne copper smelted (kg SO2 / t copper)
-    "so2_kg_per_t_copper": 25.0
-}
-
-# Dictionary of factors
-default_factors = {
-    # kg CO2e per kg metal (stage-summed rough)
-    "aluminium_virgin_kgco2_per_kg": 16.0,
-    "aluminium_recycled_kgco2_per_kg": 4.0,
-    "copper_virgin_kgco2_per_kg": 8.0,
-    "copper_recycled_kgco2_per_kg": 2.0,
-    # red mud generation per tonne aluminium
-    "red_mud_t_per_t_aluminium": 1.5,
-    # SO2 per tonne copper
     "so2_kg_per_t_copper": 25.0,
     # transport emission per ton-km (kg CO2e)
     "transport_kgco2_per_tkm": 0.05,
-    # recycling costs
+    # recycling costs (USD per tonne, illustrative)
     "recycle_cost_usd_per_t_aluminium": 200.0,
     "recycle_cost_usd_per_t_copper": 300.0
 }
 
-# Logic section
-if metal == "Aluminium":
-    if "High" in ore_quality:
-        quality_factor = 1.0
-    elif "Medium" in ore_quality:
-        quality_factor = 1.2
-    else:  # Low
-        quality_factor = 1.5
-
-    red_mud_t = default_factors["red_mud_t_per_t_aluminium"] * transport_tonnes * quality_factor
-
-elif metal == "Copper":
-    if "High" in ore_quality:
-        so2_factor = 1.0
-    elif "Medium" in ore_quality:
-        so2_factor = 1.3
-    else:  # Low
-        so2_factor = 1.6
-
-    so2_kg_total = default_factors["so2_kg_per_t_copper"] * transport_tonnes * so2_factor
-
-
-
 st.json(default_factors)
-
 st.markdown("---")
 
 # ---------------------------
 # Input panel
 # ---------------------------
 st.header("Run an LCA Estimate (Demo Input)")
+
 with st.form(key='input_form'):
     col1, col2, col3 = st.columns(3)
- with col1:
-    metal = st.selectbox("Select metal", ["Aluminium", "Copper"])
-    
-    if metal == "Aluminium":
-        state = st.selectbox(
-            "State of extraction", 
-            ["Odisha", "Gujarat", "Maharashtra", "Chhattisgarh", "Jharkhand", "Other"]
-        )
-        ore_quality = st.selectbox(
-            "Bauxite quality (Al₂O₃%)", 
-            ["High (>45%)", "Medium (35–45%)", "Low (<35%)"]
-        )
-    elif metal == "Copper":
-        state = st.selectbox(
-            "State of extraction", 
-            ["Rajasthan", "Madhya Pradesh", "Jharkhand", "Other/Import"]
-        )
-        ore_quality = st.selectbox(
-            "Copper ore grade", 
-            ["High (>2% Cu)", "Medium (1–2% Cu)", "Low (<1% Cu)"]
-        )
-    
-    production_route = st.selectbox("Production route", ["Virgin/Raw", "Recycled", "Mixed"])
-    recycled_pct = st.slider("Recycled content (%)", 0, 100, 30)
 
+    with col1:
+        metal = st.selectbox("Select metal", ["Aluminium", "Copper"])
+
+        if metal == "Aluminium":
+            state = st.selectbox(
+                "State of extraction",
+                ["Odisha", "Gujarat", "Maharashtra", "Chhattisgarh", "Jharkhand", "Other"]
+            )
+            ore_quality = st.selectbox(
+                "Bauxite quality (Al₂O₃%)",
+                ["High (>45%)", "Medium (35–45%)", "Low (<35%)"]
+            )
+        else:  # Copper
+            state = st.selectbox(
+                "State of extraction",
+                ["Rajasthan", "Madhya Pradesh", "Jharkhand", "Other/Import"]
+            )
+            ore_quality = st.selectbox(
+                "Copper ore grade",
+                ["High (>2% Cu)", "Medium (1–2% Cu)", "Low (<1% Cu)"]
+            )
+
+        production_route = st.selectbox("Production route", ["Virgin/Raw", "Recycled", "Mixed"])
+        recycled_pct = st.slider("Recycled content (%)", 0, 100, 30)
 
     with col2:
         energy_source = st.selectbox("Energy source (select nearest)", ["Coal-based grid", "Mixed grid", "Renewable-heavy"])
         transport_km = st.number_input("Transport distance (km)", min_value=0, max_value=5000, value=200)
         transport_tonnes = st.number_input("Transport quantity (tonnes of metal)", min_value=1, max_value=10000, value=1)
+
     with col3:
         eol_option = st.selectbox("End-of-life option", ["Landfill", "Recycling", "Reuse"])
         storage_practice = st.selectbox("Storage / residue handling", ["Proper authorized storage", "Temporary open storage", "Untreated disposal"])
         run_button = st.form_submit_button("Run LCA estimate")
 
+# ---------------------------
+# Calculation & results
+# ---------------------------
 if run_button:
-    # ---------------------------
     # Gap-filling logic (simple AI-style rule-based with provenance info)
-    # ---------------------------
     missing_info_notes = []
-    # Choose baseline CO2 per kg
+
+    # Baseline selection
     if metal == "Aluminium":
         if production_route == "Virgin/Raw":
             baseline = default_factors["aluminium_virgin_kgco2_per_kg"]
         elif production_route == "Recycled":
             baseline = default_factors["aluminium_recycled_kgco2_per_kg"]
-        else: # Mixed
-            baseline = (default_factors["aluminium_virgin_kgco2_per_kg"]*(100-recycled_pct)/100 +
-                        default_factors["aluminium_recycled_kgco2_per_kg"]*(recycled_pct)/100)
-        # red mud generation:
-        red_mud_t = default_factors["red_mud_t_per_t_aluminium"] * transport_tonnes
-    else:
+        else:  # Mixed
+            baseline = (default_factors["aluminium_virgin_kgco2_per_kg"] * (100 - recycled_pct) / 100 +
+                        default_factors["aluminium_recycled_kgco2_per_kg"] * recycled_pct / 100)
+    else:  # Copper
         if production_route == "Virgin/Raw":
             baseline = default_factors["copper_virgin_kgco2_per_kg"]
         elif production_route == "Recycled":
             baseline = default_factors["copper_recycled_kgco2_per_kg"]
+        else:  # Mixed
+            baseline = (default_factors["copper_virgin_kgco2_per_kg"] * (100 - recycled_pct) / 100 +
+                        default_factors["copper_recycled_kgco2_per_kg"] * recycled_pct / 100)
+
+    # Ore quality adjustments
+    red_mud_t = 0.0
+    so2_kg_total = 0.0
+
+    if metal == "Aluminium":
+        if "High" in ore_quality:
+            quality_factor = 1.0
+        elif "Medium" in ore_quality:
+            quality_factor = 1.2
+        else:  # Low
+            quality_factor = 1.5
+        # default_factors red_mud is tons per ton Al
+        red_mud_t = default_factors["red_mud_t_per_t_aluminium"] * transport_tonnes * quality_factor
+
+    else:  # Copper
+        if "High" in ore_quality:
+            so2_factor = 1.0
+        elif "Medium" in ore_quality:
+            so2_factor = 1.3
         else:
-            baseline = (default_factors["copper_virgin_kgco2_per_kg"]*(100-recycled_pct)/100 +
-                        default_factors["copper_recycled_kgco2_per_kg"]*(recycled_pct)/100)
-        red_mud_t = 0
+            so2_factor = 1.6
+        so2_kg_total = default_factors["so2_kg_per_t_copper"] * transport_tonnes * so2_factor
 
     # energy adjustment (approx)
     if energy_source == "Coal-based grid":
         energy_factor_multiplier = 1.2
-        provenance_energy = "Assumed national average coal-heavy grid factor (illustrative)."
+        provenance_energy = "Assumed coal-heavy grid factor (illustrative)."
     elif energy_source == "Mixed grid":
         energy_factor_multiplier = 1.0
-        provenance_energy = "Assumed mixed grid emissions factor (illustrative)."
+        provenance_energy = "Assumed mixed grid factor (illustrative)."
     else:
         energy_factor_multiplier = 0.8
         provenance_energy = "Assumed renewable-heavy grid factor (illustrative)."
 
-    # compute kg CO2 per kg metal
+    # compute kg CO2 per kg metal adjusted for energy mix
     kgco2_per_kg = baseline * energy_factor_multiplier
-    # add transport emissions (per kg basis)
-    transport_emission_per_kg = default_factors["transport_kgco2_per_tkm"] * (transport_km) * (transport_tonnes / (transport_tonnes if transport_tonnes>0 else 1)) / transport_tonnes
-    # above simplifies to per-tonne basis; easier compute per ton then convert
+
+    # transport emissions (per tonne)
     transport_kgco2_per_ton = default_factors["transport_kgco2_per_tkm"] * transport_km
-    # total per tonne
-    total_co2_per_tonne = (kgco2_per_kg * 1000) + transport_kgco2_per_ton
+
+    # total per tonne (production + transport)
+    total_co2_per_tonne = kgco2_per_kg * 1000 + transport_kgco2_per_ton
 
     # circularity score (simple composite)
     circularity = recycled_pct * 0.5
@@ -230,19 +212,11 @@ if run_button:
         circularity += 40
     circularity = min(100, circularity)
 
-    # toxicity/by-product estimates
-    so2_kg_total = 0
-    if metal == "Copper":
-        # simple estimate
-        so2_kg_total = default_factors["so2_kg_per_t_copper"] * transport_tonnes
-
     # cost estimates to recycle/reuse waste (rough)
     if metal == "Aluminium":
         recycle_cost = default_factors["recycle_cost_usd_per_t_aluminium"] * transport_tonnes
-    elif metal == "Copper":
+    else:  # Copper
         recycle_cost = default_factors["recycle_cost_usd_per_t_copper"] * transport_tonnes
-    else:
-        recycle_cost = 0
 
     # ---------------------------
     # Show results
@@ -259,17 +233,20 @@ if run_button:
     st.subheader("Breakdown (per tonne basis)")
     breakdown_df = pd.DataFrame({
         "Stage": ["Production+smelting (kg CO2e/kg *1000)", "Transport (kg CO2e/t)", "Total (kg CO2e/t)"],
-        "Value": [kgco2_per_kg*1000, transport_kgco2_per_ton, total_co2_per_tonne]
+        "Value": [kgco2_per_kg * 1000, transport_kgco2_per_ton, total_co2_per_tonne]
     })
     st.table(breakdown_df)
 
     st.subheader("By-product / Toxic emissions (illustrative)")
     if metal == "Aluminium":
-        st.write(f"Red mud estimate: **{red_mud_t:.2f} tonnes** of red mud produced for {transport_tonnes} t of aluminium (typical literature estimate ~1.5 t red mud / t Al).")
+        st.write(
+            f"Red mud estimate: **{red_mud_t:.2f} tonnes** of red mud produced for {transport_tonnes} t of aluminium "
+            f"(typical literature estimate ~1.5 t red mud / t Al, adjusted by ore quality)."
+        )
         st.write("Valuable routes: cement substitute, pigment (iron oxides), rare earth recovery (pilot scale). See CPCB red mud guidelines (sources).")
     else:
         st.write(f"Estimated SO₂ generation: **{so2_kg_total:.1f} kg** for {transport_tonnes} t of copper smelted (illustrative).")
-        st.write("Captured SO₂ can be converted to sulfuric acid (H2SO4) — valuable industrial chemical (fertilizers, chemicals).")
+        st.write("Captured SO₂ can be converted to sulfuric acid (H₂SO₄) — valuable industrial chemical (fertilizers, chemicals).")
 
     st.markdown("---")
     st.subheader("Compliance card (quick flags)")
@@ -309,9 +286,9 @@ if run_button:
         pdf.ln(2)
         pdf.multi_cell(0, 6, f"Estimated outputs (illustrative):\nCO2 per kg: {kgco2_per_kg:.2f} kg CO2/kg\nCO2 per t (incl transport): {total_co2_per_tonne:.0f} kg CO2/t\nCircularity score: {circularity:.1f}/100\n")
         if metal == "Aluminium":
-            pdf.multi_cell(0,6,f"Red mud generation estimate: {red_mud_t:.2f} t (per {transport_tonnes} t Al) — consider CPCB-recommended valorization paths (cement, pigments, REE extraction).\n")
+            pdf.multi_cell(0, 6, f"Red mud generation estimate: {red_mud_t:.2f} t (for {transport_tonnes} t Al) — consider CPCB-recommended valorization paths (cement, pigments, REE extraction).\n")
         else:
-            pdf.multi_cell(0,6,f"SO2 estimate: {so2_kg_total:.1f} kg — recommend capture and conversion to sulfuric acid.\n")
+            pdf.multi_cell(0, 6, f"SO2 estimate: {so2_kg_total:.1f} kg — recommend capture and conversion to sulfuric acid.\n")
         pdf.output("SustainaMine_LCA_Summary.pdf")
         st.success("SustainaMine_LCA_Summary.pdf generated (download from working directory).")
 
@@ -321,4 +298,3 @@ for k, v in SOURCES.items():
     st.write(f"- **{k}** : {v}")
 
 st.markdown("**Important note:** This prototype provides *illustrative* computations and policy references. Replace default parameters with validated process data and local SPCB thresholds before using for compliance submission. This tool **assists** compliance — it does not replace statutory approvals.")
-
