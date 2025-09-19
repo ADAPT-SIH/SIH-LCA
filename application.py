@@ -7,7 +7,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 #import matplotlib as plt
-matplotlib.use("Agg")  # safe backend on headless/cloud hosts
+#matplotlib.use("Agg")  # safe backend on headless/cloud hosts
 #import matplotlib.pyplot as plt
 from fpdf import FPDF
 
