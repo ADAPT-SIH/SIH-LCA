@@ -1,4 +1,5 @@
-streamlit>=1.38
-matplotlib>=3.9
-pandas>=2.2
-numpy>=1.26
+streamlit>=1.18
+pandas
+matplotlib
+fpdf
+numpy
