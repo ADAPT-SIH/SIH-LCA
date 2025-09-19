@@ -84,28 +84,31 @@ default_factors = {
     "aluminium_recycled_kgco2_per_kg": 4.0,
     "copper_virgin_kgco2_per_kg": 8.0,
     "copper_recycled_kgco2_per_kg": 2.0,
-    # red mud generation per tonne aluminium (tons red mud / ton Al) - typical literature range ~1 - 1.8
+    # red mud generation per tonne aluminium (tons red mud / ton Al)
     "red_mud_t_per_t_aluminium": 1.5,
-    # SO2 estimate per tonne copper smelted (kg SO2 / t copper) - illustrative
-    "so2_kg_per_t_copper": 25.0,
-    # Adjust red mud estimate based on ore quality
-with st.form("input_form"): 
-    if metal == "Aluminium":
+    # SO2 estimate per tonne copper smelted (kg SO2 / t copper)
+    "so2_kg_per_t_copper": 25.0
+}
 
+# ✅ Logic should be outside
+if metal == "Aluminium":
     if "High" in ore_quality:
         quality_factor = 1.0
     elif "Medium" in ore_quality:
         quality_factor = 1.2
     else:  # Low
         quality_factor = 1.5
+
     red_mud_t = default_factors["red_mud_t_per_t_aluminium"] * transport_tonnes * quality_factor
-if metal == "Copper":
+
+elif metal == "Copper":
     if "High" in ore_quality:
         so2_factor = 1.0
     elif "Medium" in ore_quality:
         so2_factor = 1.3
     else:  # Low
         so2_factor = 1.6
+
     so2_kg_total = default_factors["so2_kg_per_t_copper"] * transport_tonnes * so2_factor
 
 
